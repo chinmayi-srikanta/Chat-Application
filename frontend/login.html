@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - DM Chat</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #fdfbfb, #ebedee);
+    }
+
+    .card {
+      width: 360px;
+      background: white;
+      padding: 35px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+      color: #111;
+    }
+
+    p {
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #0095f6;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: #0095f6;
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0077cc;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: red;
+    }
+
+    .link {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .link a {
+      color: #0095f6;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>DM Chat</h1>
+    <p>Login to continue</p>
+
+    <input id="username" placeholder="Username" autocomplete="off">
+    <input id="password" type="password" placeholder="Password">
+
+    <button type="button" id="loginBtn">Login</button>
+
+    <div id="message"></div>
+
+    <div class="link">
+      New here? <a href="signup.html">Create an account</a>
+    </div>
+  </div>
+
+  <script>
+    const loginBtn = document.getElementById("loginBtn");
+    const messageBox = document.getElementById("message");
+
+    loginBtn.addEventListener("click", login);
+
+    document.getElementById("password").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        login();
+      }
+    });
+
+    async function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      messageBox.innerText = "";
+
+      if (!username || !password) {
+        messageBox.innerText = "Please enter username and password.";
+        return;
+      }
+
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (data.message === "Login success") {
+          localStorage.setItem("user", JSON.stringify({ username }));
+          window.location.href = "chat.html";
+        } else {
+          messageBox.innerText = data.message;
+        }
+      } catch (err) {
+        messageBox.innerText = "Server error. Make sure backend is running.";
+      }
+    }
+  </script>
+
+</body>
+</html>
